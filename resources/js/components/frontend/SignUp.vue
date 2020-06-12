@@ -95,7 +95,7 @@ export default {
             this.errors = error.response.data.errors;
           } else if (error.response.status == 401) {
             this.errors = [];
-            this.errorMsg = error.response.data.error;
+            this.errorMsg = error.response.data.errors;
           } else {
             alert(error);
           }

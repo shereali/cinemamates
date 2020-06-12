@@ -62,7 +62,6 @@ export default {
     axios.get(this.url + "/api/films").then(res => {});
   },
   mounted() {
-    console.log("Hello mounsted");
     this.getResults();
   },
   methods: {

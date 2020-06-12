@@ -8,11 +8,11 @@
             <form class="form" id="signin" @submit.prevent="signIn">
               <div class="form-group">
                 <label for>Email</label>
-                <input v-model="email" type="email" class="form-control" autofocus />
+                <input v-model="email" name="email" type="email" class="form-control" autofocus />
               </div>
               <div class="form-group">
                 <label for>Password</label>
-                <input v-model="password" type="password" class="form-control" />
+                <input v-model="password" name="password" type="password" class="form-control" />
               </div>
               <button type="submit" class="form control btn btn-md btn-primary">Sign In</button>
             </form>

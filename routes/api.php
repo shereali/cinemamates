@@ -33,6 +33,11 @@ Route::group(['namespace' => 'API', 'middleware' => 'auth:sanctum'], function(){
  Route::get('/country', 'CreateFilmController@getCountry'); 
  Route::get('/genre', 'CreateFilmController@getGenre'); 
  Route::post('/create-film', 'CreateFilmController@createNewFilm'); 
+ Route::apiResources(
+        [
+            'comment' => 'CommentController'
+        ]
+    );
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

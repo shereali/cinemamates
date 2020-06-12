@@ -30,23 +30,29 @@
       </div>
     </div>
     <div class="card mt-10">
-      <div class="card-body">
+      <div class="card-body" v-if="isLogged">
         <div class="row">
           <div class="col-lg-6 offset-2">
             <h3 class="card-title">Post Comment:</h3>
-            <form action class="form">
+            <div v-if="alert_type == true" :class="'alert alert-'+status">{{ message }}</div>
+            <form class="form">
               <div class="form-group">
                 <label for>Name:</label>
-                <input name="name" type="text" class="form-control" />
+                <input v-model="form.name" type="text" class="form-control" />
+                <div v-if="errors.name" class="text-danger">{{ errors.name[0] }}</div>
               </div>
               <div class="form-group">
                 <label for>Comment:</label>
-                <textarea name="comment" class="form-control" cols="30" rows="3"></textarea>
+                <textarea v-model="form.comment" class="form-control" cols="30" rows="3"></textarea>
+                <div v-if="errors.comment" class="text-danger">{{ errors.comment[0] }}</div>
               </div>
-              <button class="btn btn-md btn-primary">Comment</button>
+              <button @click.prevent="makeComment()" class="btn btn-md btn-primary">Comment</button>
             </form>
           </div>
         </div>
+      </div>
+      <div v-else class="col-lg-6 offset-2">
+        <router-link class="ml-10" to="/signin">Post Comment</router-link>
       </div>
     </div>
     <div class="card">
@@ -82,21 +88,59 @@
 <script>
 import { log } from "util";
 import moment from "moment";
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
       film: {},
-      url: window.location.origin
+      url: window.location.origin,
+      message: "",
+      errors: "",
+      alert_type: false,
+      status: "",
+      form: {
+        film_id: ""
+      }
     };
+  },
+  computed: {
+    ...mapGetters(["isLogged"])
   },
 
   created() {
-    axios.get(this.url + "/api/movie/" + this.$route.params.slug).then(res => {
-      this.film = res.data.data;
-      console.log(this.film);
-    });
+    this.getFilm();
   },
   methods: {
+    makeComment() {
+      axios
+        .post(this.url + "/api/comment", this.form)
+        .then(res => {
+          if (res.status == 200) {
+            this.getFilm();
+            this.alert_type = true;
+            this.message = res.data.message;
+            this.status = "success";
+          }
+        })
+        .catch(error => {
+          if (error.response.status == 422) {
+            console.log(error.response.data.errors);
+            this.errors = error.response.data.errors;
+          } else if (error.response.status == 401) {
+            this.errors = error.response.data.errors;
+          }
+        });
+    },
+
+    getFilm() {
+      axios
+        .get(this.url + "/api/movie/" + this.$route.params.slug)
+        .then(res => {
+          this.film = res.data.data;
+          this.form.film_id = res.data.data.id;
+        });
+    },
+
     dateFormat(date) {
       return moment(date).format("MMMM Do YYYY, h:mm:ss a");
     }
